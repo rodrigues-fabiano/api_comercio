@@ -10,6 +10,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.br.CNPJ;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -27,9 +33,9 @@ public class Fornecedor {
 	private Integer idFornecedor;
 
 	@Column(name = "cnpj")
-	//@NotEmpty(message = "O número do CNPJ não pode ficar em branco.")
-	//@Digits(message="O CNPJ deve conter 14 números.", fraction = 0, integer = 14)
-	private Integer cnpj;
+	@NotBlank(message = "O número do CNPJ não pode ficar em branco.")
+	@CNPJ(message="O CNPJ deve conter 14 números.")
+	private String cnpj;
 
 	@Column(name = "tipo")
 	private String tipo;
@@ -38,12 +44,14 @@ public class Fornecedor {
 	private String razaoSocial;
 	
 	@Column(name = "uf")
+	@Size(min = 2, max = 2, message = "A UF deve conter 2 caracteres")
 	private String uf;
 	
 	@Column(name = "telefone")
 	private String telefone;
 	
 	@Column(name = "email")
+	@Email(message = "E-mail inválido, confira o padrão inserido")
 	private String email;
 	
 	@Column(name = "nome_fantasia")
@@ -59,7 +67,7 @@ public class Fornecedor {
 	private String logradouro;
 	
 	@Column(name = "numero")
-	private Integer numero;
+	private String numero;
 	
 	@Column(name = "complemento")
 	private String complemento;
@@ -71,6 +79,7 @@ public class Fornecedor {
 	private String municipio;
 	
 	@Column(name = "data_abertura")
+	@Past(message = "Data inválida, escolha uma data anterior à data de hoje")
 	private Date dataAbertura;
 
 	@OneToMany(mappedBy = "fornecedor")
@@ -85,11 +94,11 @@ public class Fornecedor {
 		this.idFornecedor = idFornecedor;
 	}
 
-	public Integer getCnpj() {
+	public String getCnpj() {
 		return cnpj;
 	}
 
-	public void setCnpj(Integer cnpj) {
+	public void setCnpj(String cnpj) {
 		this.cnpj = cnpj;
 	}
 
@@ -165,11 +174,11 @@ public class Fornecedor {
 		this.logradouro = logradouro;
 	}
 
-	public Integer getNumero() {
+	public String getNumero() {
 		return numero;
 	}
 
-	public void setNumero(Integer numero) {
+	public void setNumero(String numero) {
 		this.numero = numero;
 	}
 
@@ -212,7 +221,5 @@ public class Fornecedor {
 	public void setProdutoList(List<Produto> produtoList) {
 		this.produtoList = produtoList;
 	}
-	
-	
 	
 }

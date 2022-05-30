@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,15 +15,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.residencia.comercio.dtos.CategoriaDTO;
 import com.residencia.comercio.entities.Categoria;
 import com.residencia.comercio.exceptions.NoSuchElementFoundException;
 import com.residencia.comercio.services.CategoriaService;
-
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @RestController
 @RequestMapping("/categoria")
@@ -46,13 +46,13 @@ public class CategoriaController {
 	public ResponseEntity<Categoria> findCategoriaById(@PathVariable Integer id) {
 		Categoria categoria = categoriaService.findCategoriaById(id);
 		if(null == categoria)
-			throw new NoSuchElementFoundException("Não foi encontrado Categoria com o id " + id);
+			throw new NoSuchElementFoundException("Não foi encontrada Categoria com o id " + id);
 		else
 			return new ResponseEntity<>(categoria, HttpStatus.OK);
 	}
 	
 	@PostMapping
-	public ResponseEntity<Categoria> saveCategoria(@RequestBody Categoria categoria) {
+	public ResponseEntity<Categoria> saveCategoria(@Valid @RequestBody Categoria categoria) {
 		Categoria novoCategoria = categoriaService.saveCategoria(categoria);
 		return new ResponseEntity<>(novoCategoria, HttpStatus.CREATED);
 	}
@@ -63,10 +63,20 @@ public class CategoriaController {
 		return new ResponseEntity<>(novoCategoriaDTO, HttpStatus.CREATED);
 	}
 	
+	@PostMapping(value = "/com-foto", consumes = 
+			{MediaType.APPLICATION_JSON_VALUE, 
+			MediaType.MULTIPART_FORM_DATA_VALUE})
+	public ResponseEntity<Categoria> saveCategoriaComFoto(
+			@RequestPart("categoria") String categoria,
+			@RequestPart("file") MultipartFile file) {
+		
+		Categoria novaCategoria = categoriaService.saveCategoriaComFoto(categoria, file);
+		return new ResponseEntity<>(novaCategoria, HttpStatus.CREATED);
+	}
 	@PutMapping
-	public ResponseEntity<Categoria> updateCategoria(@RequestBody Categoria categoria) {
-		Categoria novoCategoria = categoriaService.updateCategoria(categoria);
-		return new ResponseEntity<>(novoCategoria, HttpStatus.OK);
+	public ResponseEntity<Categoria> updateCategoria(@Valid @RequestBody Categoria categoria) {
+		Categoria novaCategoria = categoriaService.updateCategoria(categoria);
+		return new ResponseEntity<>(novaCategoria, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
